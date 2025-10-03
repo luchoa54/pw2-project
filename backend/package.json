@@ -16,7 +16,8 @@
     "@prisma/client": "^6.15.0",
     "dotenv": "^17.2.1",
     "envalid": "^8.1.0",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "joi": "^18.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
