@@ -1,0 +1,9 @@
+.buttonIcon {
+    cursor: pointer;
+}
+
+.buttonIcon :disabled {
+    cursor: default;
+    opacity: 20%;
+}
+ 

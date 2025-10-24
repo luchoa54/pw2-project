@@ -6,7 +6,7 @@ services:
       target: development
     restart: always
     ports:
-      - ${PORT_BACKEND}:6677
+      - ${PORT_BACKEND}:7788
     volumes:
       - ./backend:/app
       - /app/node_modules 

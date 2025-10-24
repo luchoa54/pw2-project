@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs"
 import { PrismaClient, User } from "@prisma/client";
-import { LoginDto } from './auth.types';
-import { UserTypes } from '../userType/userType.constants';
+import { LoginDto, SignUpDto } from './auth.types';
+import { UserTypes } from '../user/userType/userType.constants';
 const prisma = new PrismaClient();
 
 export const checkAuth = async (
@@ -15,12 +15,30 @@ export const checkAuth = async (
   return null;
 };
 
-export const checkIsAdmin = async (userId: string): Promise<boolean> => {
+export const checkCredentials = async (userId: string): Promise<boolean> => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { userTypeId: true },
   });
 
   if (!user) { return false; }
-  return user.userTypeId === UserTypes.ADMIN;
+  return user.userTypeId === UserTypes.admin;
+};
+
+export const findUserByEmail = async (email: string): Promise<User | null> => {
+  return prisma.user.findUnique({ where: { email } });
+};
+
+export const createUser = async (data: SignUpDto): Promise<User> => {
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+
+  const newUser = await prisma.user.create({
+    data: {
+      name: data.name,
+      email: data.email,
+      password: hashedPassword,
+      userTypeId: UserTypes.client,
+    },
+  });
+  return newUser;
 };

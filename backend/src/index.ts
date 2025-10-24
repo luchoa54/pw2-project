@@ -5,10 +5,12 @@ import cookieParser from "cookie-parser"
 import setLangCookie from "./middlewares/setLangCookie"
 import session from "express-session"
 import { v4 as uuidv4 } from "uuid"
+
 declare module "express-session" {
   interface SessionData {
     uid: string
-    tipoUsuario: string
+    userType: string
+    userId: string;
   }
 }
 dotenv.config()
