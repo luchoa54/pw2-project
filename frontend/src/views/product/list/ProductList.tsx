@@ -25,7 +25,7 @@ function ProductList( { products } : ProductListProps ) {
         <div>
             <div className="flex justify-between mb-2">
                 <h1 className="text-2xl font-bold">Lista de Produtos</h1>
-                <TextInput onChange={(e) => setSearchString(e.target.value)} className="w-80"  type="text" placeholder="pesquisa" required />
+                <TextInput onChange={(e) => setSearchString(e.target.value)} className="w-80"  type="text" placeholder="Pesquisa" required />
             </div>
 
             <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">

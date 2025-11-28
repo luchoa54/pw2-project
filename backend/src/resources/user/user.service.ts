@@ -1,8 +1,9 @@
 // src/resources/user/user.service.ts
 
 import { PrismaClient } from "@prisma/client";
-import { UpdateUserDto } from "./user.types";
+import { CreateUserDto, UpdateUserDto } from "./user.types";
 import bcrypt from "bcryptjs";
+import { UserTypes } from "./userType/userType.constants";
 
 const prisma = new PrismaClient();
 
@@ -13,6 +14,19 @@ const userSelect = {
   userTypeId: true,
   createdAt: true,
   updatedAt: true,
+};
+
+export const create = async (data: CreateUserDto) => {
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+
+  return prisma.user.create({
+    data: {
+      ...data,
+      password: hashedPassword,
+      userTypeId: UserTypes.client,
+    },
+    select: userSelect,
+  });
 };
 
 export const findAll = async () => {

@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { UserTypes } from "../src/resources/userType/userType.constants";
+import { UserTypes } from "../src/resources/user/userType/userType.constants";
 const prisma = new PrismaClient();
 
 async function main() {

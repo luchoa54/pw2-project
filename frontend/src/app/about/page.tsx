@@ -1,5 +1,10 @@
-function About() {
-    return <h1>About</h1>
+import React from "react";
+import About from "@/views/about/About";
+
+function AboutPage() {
+    return (
+        <About />
+    )
 }
 
-export default About
+export default AboutPage

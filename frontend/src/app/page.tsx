@@ -1,20 +1,22 @@
+import api from "../utils/api";
 import ProductList from "../views/product/list/ProductList";
 
-async function Home() {
-  const resp = await fetch(
-    `${process.env.NEXT_PUBLIC_DOCKER_API}/product`, 
-    {
-      cache: 'no-store' 
-    }
-  );
-  
-  const products = await resp.json();
+export const dynamic = 'force-dynamic';
 
-  return (
-    <div>
-      <ProductList products={products} />
-    </div>
-  );
+async function Home() {
+  try {
+    const response = await api.get('/product');
+    const products = response.data;
+
+    return (
+      <div>
+        <ProductList products={products} />
+      </div>
+    );
+  } catch (error) {
+    console.error("Erro ao buscar produtos:", error);
+    return <div>Erro ao carregar produtos.</div>;
+  }
 }
 
 export default Home;

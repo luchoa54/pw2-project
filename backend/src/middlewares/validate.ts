@@ -1,3 +1,4 @@
+// Deixe seu validate.ts assim
 import { Request, Response, NextFunction } from "express";
 import { Schema } from "joi";
 
@@ -6,7 +7,13 @@ const validate = (schema: Schema) => {
     const { error } = schema.validate(req.body, {
       abortEarly: false,
     })
-    if (error) res.status(422).json({ error: error.details })
+    if (error) {
+      // Usar 400 é bom para o .catch() que fizemos no frontend
+      res.status(400).json({ 
+          message: "Os dados fornecidos são inválidos.",
+          details: error.details 
+      })
+    }
     else next()
   }
 }

@@ -1,9 +1,10 @@
 import React from "react";
+import ProductCreate from "@/views/product/item/ProductCreate";
 
-function page() {
+function CreatePage() {
     return (
-        <div>Page</div>
+        <ProductCreate />
     )
 }
 
-export default page
+export default CreatePage

@@ -9,3 +9,10 @@ export interface ProductDto {
     createdAt: Date,
     updatedAt: Date
 }
+
+export interface CreateProductDto {
+    name: string,
+    description: string,
+    price: string,
+    stock: number,
+}
