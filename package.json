@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@types/cors": "^2.8.19"
+  },
+  "dependencies": {
+    "flowbite": "^3.1.2"
+  }
+}

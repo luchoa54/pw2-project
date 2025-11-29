@@ -9,7 +9,9 @@ FROM node:22-alpine3.22 AS production
 WORKDIR /app
 ENV NODE_ENV=production
 COPY package*.json .
-RUN npm ci omit=dev
+RUN npm ci --omit=dev
+COPY --from=build /app/prisma ./prisma/
+RUN npx prisma generate
 COPY --from=build /app/dist ./dist
 EXPOSE 6677
 CMD [ "npm", "run", "start:prod" ]
@@ -17,5 +19,10 @@ CMD [ "npm", "run", "start:prod" ]
 FROM node:22-alpine3.22 AS development
 WORKDIR /app
 ENV NODE_ENV=development
+COPY package*.json .
+RUN npm install
+COPY prisma ./prisma/
+RUN npx prisma generate
+
 EXPOSE 6677
 CMD [ "npm", "start"]
