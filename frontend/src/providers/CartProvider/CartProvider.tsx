@@ -14,12 +14,14 @@ interface CartContextProps {
   cartProducts: Record<string, number>;
   incCartProduct: (productId: string) => void;
   decCartProduct: (productId: string) => void;
+  isInitialized: boolean;
 }
 
 const initialCart: CartContextProps = {
   cartProducts: {},
   incCartProduct: () => {},
   decCartProduct: () => {},
+  isInitialized: false
 };
 
 export const CartContext = createContext<CartContextProps>(initialCart);
@@ -27,57 +29,78 @@ export const CartContext = createContext<CartContextProps>(initialCart);
 function CartProvider({ children }: { children: ReactNode }) {
   const { user } = useContext(AuthContext);
   const [cartProducts, setCartProducts] = useState<Record<string, number>>({});
+  
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     if (user) {
-      api.get("/purchase/cart").then((res) => {
-        const items = res.data.purchaseItems || [];
-        const cartState: Record<string, number> = {};
-        items.forEach((i: any) => {
-          cartState[i.productId] = i.quantity;
-        });
-        setCartProducts(cartState);
-      });
+      api.get("/purchase/cart")
+        .then((res) => {
+          const rawData = res.data;
+          const items = Array.isArray(rawData) ? rawData : (rawData.purchaseItems || []);
+          
+          const cartState: Record<string, number> = {};
+          items.forEach((i: any) => {
+            const id = i.productId || i.id; 
+            cartState[id] = i.quantity || 1;
+          });
+          
+          setCartProducts(cartState);
+        })
+        .catch(err => console.error(err))
+        .finally(() => setIsInitialized(true));
+
     } else {
-      const savedCart = localStorage.getItem("cartProducts");
-      if (savedCart) {
-        setCartProducts(JSON.parse(savedCart));
+      if (typeof window !== "undefined") {
+        const savedCart = localStorage.getItem("cartProducts");
+        if (savedCart) {
+          try {
+            setCartProducts(JSON.parse(savedCart));
+          } catch (error) {
+            console.error("Erro ao ler localStorage", error);
+          }
+        }
       }
+      setIsInitialized(true);
     }
   }, [user]);
 
+
   useEffect(() => {
-    localStorage.setItem("cartProducts", JSON.stringify(cartProducts));
-  }, [cartProducts]);
+    if (!isInitialized) return;
+    if (!user) {
+      localStorage.setItem("cartProducts", JSON.stringify(cartProducts));
+    }
+  }, [cartProducts, user, isInitialized]);
+
 
   const incCartProduct = async (productId: string) => {
-    if (user) {
-      try {
-        await api.post("/purchaseItem/inc", { productId });
-      } catch (err) {
-        console.log("Erro ao atualizar no backend", err);
-      }
-    }
-
     setCartProducts((c) => ({
       ...c,
       [productId]: (c[productId] ?? 0) + 1,
     }));
+
+    if (user) {
+      try {
+        await api.post("/purchaseItem/inc", { productId });
+      } catch (err) { console.error(err); }
+    }
   };
 
   const decCartProduct = async (productId: string) => {
+    const currentQtd = cartProducts[productId];
+    if (!currentQtd) return;
+
     if (user) {
       try {
         await api.post("/purchaseItem/dec", { productId });
-      } catch (err) {
-        console.log(err);
-      }
+      } catch (err) { console.error(err); }
     }
 
-    if (cartProducts[productId] === 1) {
-      const copyCartProducts = { ...cartProducts };
-      delete copyCartProducts[productId];
-      setCartProducts(copyCartProducts);
+    if (currentQtd === 1) {
+      const copy = { ...cartProducts };
+      delete copy[productId];
+      setCartProducts(copy);
     } else {
       setCartProducts((c) => ({
         ...c,
@@ -92,6 +115,7 @@ function CartProvider({ children }: { children: ReactNode }) {
         cartProducts,
         incCartProduct,
         decCartProduct,
+        isInitialized,
       }}
     >
       {children}

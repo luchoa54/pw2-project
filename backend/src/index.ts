@@ -13,6 +13,7 @@ declare module "express-session" {
     uid: string
     userType: string
     userId: string;
+    userName: string
   }
 }
 dotenv.config()

@@ -1,73 +1,59 @@
 "use client"
 
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useContext, useState } from "react";
 import { Button } from "flowbite-react";
-import TextInput from "@/components/form/TextInput/TextInput";
+import TextInput from "@/components/form/TextInput/TextInput"; // Seu componente customizado
+import { AuthContext } from "@/providers/AuthProvider/AuthProvider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-function Register() {
+function Signup() {
+    // Estados separados para manter o padrão do seu Login
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
     
+    // Estado de erro geral ou específico
+    const [error, setError] = useState('');
+    
+    const { signup } = useContext(AuthContext);
     const router = useRouter();
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleSubmit = async(e: FormEvent) => {
         e.preventDefault();
-        setError('');
+        setError(''); // Limpa erros anteriores
 
-        // 1. Validação básica no Frontend
+        // 1. Validação básica no front
         if (password !== confirmPassword) {
-            setError("As senhas não conferem.");
+            setError("As senhas não coincidem");
             return;
         }
 
-        if (password.length < 6) {
-             setError("A senha deve ter pelo menos 6 caracteres.");
-             return;
-        }
+        // 2. Chama a função do contexto
+        const ok = await signup({
+            name, 
+            email, 
+            password,
+            // IMPORTANTE: Use o UUID real do seu banco para o tipo Cliente
+            userTypeId: "a536e89e-cbbc-11f0-aa2c-b2115d9208c8" 
+        });
 
-        setLoading(true);
-
-        try {
-            
-            const response = await fetch(`${process.env.NEXT_PUBLIC_DOCKER_API}/auth/register`, { 
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name,
-                    email,
-                    password,
-                }),
-            });
-
-            if (response.ok) {
-                // Sucesso: Redireciona para o login
-                router.push("/login");
-            } else {
-                // Erro: Tenta pegar a mensagem do backend
-                const data = await response.json();
-                setError(data.message || "Erro ao realizar cadastro.");
-            }
-        } catch (err) {
-            console.error(err);
-            setError("Erro de conexão com o servidor.");
-        } finally {
-            setLoading(false);
+        // 3. Redireciona ou mostra erro
+        if (ok) {
+            alert("Cadastro realizado com sucesso!");
+            router.push("/login");
+        } else {
+            setError("Erro ao cadastrar. Email já utilizado?");
         }
     }
 
     return (
         <>
-            <h1 className="text-2xl font-bold mb-2">Criar Nova Conta</h1>
+            <h1 className="text-2xl font-bold mb-2"> Cadastro de Usuário </h1>
             
             <form onSubmit={handleSubmit} className="flex max-w-md flex-col gap-4">
+                
                 <TextInput
                     name="name"
                     label="Nome Completo"
@@ -81,11 +67,10 @@ function Register() {
                     label="Email"
                     value={email}
                     onChange={setEmail}
-                    type="email"
                 />
 
                 <TextInput
-                    name="senha"
+                    name="password"
                     label="Senha"
                     value={password}
                     onChange={setPassword}
@@ -93,27 +78,28 @@ function Register() {
                 />
 
                 <TextInput
-                    name="confirmarSenha"
+                    name="confirmPassword"
                     label="Confirmar Senha"
                     value={confirmPassword}
                     onChange={setConfirmPassword}
                     type="password"
-                    error={error}
+                    error={error} // Mostra o erro no último campo
                 />
 
-                <Button type="submit" isProcessing={loading} disabled={loading}>
-                    {loading ? 'Cadastrando...' : 'Cadastrar'}
-                </Button>
+                <Button type="submit">Cadastrar</Button>
 
-                <div className="text-sm text-gray-500 mt-2">
-                    Já tem uma conta?{' '}
-                    <Link href="/login" className="text-blue-600 hover:underline">
+                <div className="flex justify-center text-sm font-medium text-gray-500 dark:text-gray-300 mt-2">
+                    Já tem uma conta?&nbsp;
+                    <Link
+                        href="/login"
+                        className="text-cyan-700 hover:underline dark:text-cyan-500"
+                    >
                         Faça login
                     </Link>
                 </div>
             </form>
         </>
-    );
+    )
 }
 
-export default Register;
+export default Signup;

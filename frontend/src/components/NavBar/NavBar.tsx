@@ -5,7 +5,6 @@ import { Navbar, NavbarBrand, NavbarCollapse, NavbarLink, NavbarToggle } from "f
 import Image from "next/image";
 import Link from "next/link";
 import { AuthContext } from "@/providers/AuthProvider/AuthProvider"; 
-import { CounterContext } from "@/providers/CounterProvider/CounterProvider";
 
 export function NavBar() {
   const { user, logout } = useContext(AuthContext); 

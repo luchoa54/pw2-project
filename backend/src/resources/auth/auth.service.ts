@@ -22,7 +22,7 @@ export const checkCredentials = async (userId: string): Promise<boolean> => {
   });
 
   if (!user) { return false; }
-  return user.userTypeId === UserTypes.admin;
+  return user.userTypeId === UserTypes.ADMIN;
 };
 
 export const findUserByEmail = async (email: string): Promise<User | null> => {
@@ -37,7 +37,11 @@ export const createUser = async (data: SignUpDto): Promise<User> => {
       name: data.name,
       email: data.email,
       password: hashedPassword,
-      userTypeId: UserTypes.client,
+      userType: {
+        connect: {
+          id: data.userTypeId 
+        }
+      }
     },
   });
   return newUser;

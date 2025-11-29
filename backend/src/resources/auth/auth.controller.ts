@@ -7,6 +7,16 @@ import { checkAuth,
 import { ReasonPhrases, StatusCodes } from "http-status-codes"
 
 const authController = {
+  me: async (req: Request, res: Response) => {
+    if (req.session.userId) {
+      return res.status(StatusCodes.OK).json({
+        userId: req.session.userId,
+        userType: req.session.userType,
+        userName: req.session.userName 
+      });
+    }
+    return res.status(StatusCodes.UNAUTHORIZED).json({ msg: "Sessão inválida" });
+  },
   signup: async (req: Request, res: Response) => {
     const usuarioData = req.body as SignUpDto;
     try {
@@ -30,6 +40,7 @@ const authController = {
       if (!user) return res.status(StatusCodes.UNAUTHORIZED)
       req.session.userType = user.userTypeId
       req.session.userId = user.id
+      req.session.userName = user.name
       res.status(StatusCodes.OK).json({
         userId: user.id,
         userType: user.userTypeId,

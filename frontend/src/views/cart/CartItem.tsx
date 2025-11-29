@@ -3,8 +3,8 @@
 import { Card } from "flowbite-react";
 import { useContext, useState } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa";
-import { ProductDto } from "../product/Product.types";
-import styles from "../Product.module.css";
+import { ProductDto } from "@/views/product/Product.types";
+import styles from "@/views/product/Product.module.css";
 import { CounterContext } from "@/providers/CounterProvider/CounterProvider";
 import { CartContext } from "@/providers/CartProvider/CartProvider";
 
