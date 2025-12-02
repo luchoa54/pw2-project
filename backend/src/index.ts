@@ -31,7 +31,7 @@ app.use(setLangCookie)
 app.use(
   session({
     genid: (req) => uuidv4(),
-    secret: "Hi9Cf#mK98",
+    secret: env.SESSION_SECRET,
     resave: true,
     saveUninitialized: true,
   }),
